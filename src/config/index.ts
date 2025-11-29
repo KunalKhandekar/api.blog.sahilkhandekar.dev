@@ -10,6 +10,7 @@ const config = {
   NODE_ENV: process.env.NODE_ENV,
   WHITELIST_ORIGINS: [''],
   MONGO_URI: process.env.MONGO_URI,
+  LOG_LEVEL: process.env.LOG_LEVEL,
 };
 
 export default config;
