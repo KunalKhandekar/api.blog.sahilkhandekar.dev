@@ -14,6 +14,11 @@ import config from '@/config';
 import limiter from '@/lib/express_rate_limit';
 
 /**
+ * Router
+ */
+import v1Routes from '@/routes/v1';
+
+/**
  * Types
  */
 import type { CorsOptions } from 'cors';
@@ -68,13 +73,17 @@ app.use(helmet());
 // Rate limit middleware to prevent excessive requests and enhance security
 app.use(limiter);
 
+/**
+ * Immeidately Invoked Async Function Expression (IIFE) to start the server.
+ *
+ * - Tries to connect to the database before initializing the server.
+ * - Defines the API routes (/api/v1).
+ * - Starts the server on the specified PORT and logs the running URL.
+ * - If an error occurs during the startup, it is logged, and the process exits with status 1.
+ */
 (async () => {
   try {
-    app.get('/', (req, res) => {
-      res.json({
-        message: 'Hello world',
-      });
-    });
+    app.use('/api/v1', v1Routes);
 
     app.listen(config.PORT, () => {
       console.log(`Server is running: http://localhost:${config.PORT}`);
@@ -86,3 +95,30 @@ app.use(limiter);
     }
   }
 })();
+
+/**
+ * Handles server shutdown gracefully by disconnecting from the database
+ *
+ * - Attemspts to disconnect from the database before shutting down the server.
+ * - Logs a success message upon successful disconnection.
+ * - If an error occurs during disconnection, it is logged to the console.
+ * - Exits the process with status 0 (Indicates successful termination).
+ */
+const handleServerShutdown = async () => {
+  try {
+    console.log('Server SHUTDOWN');
+    process.exit(0);
+  } catch (error) {
+    console.log('Error during server shutdown', error);
+  }
+};
+
+/**
+ * Listens for termination signals (`SIGTERM` and `SIGINT`)
+ *
+ * - `SIGTERM` is typically sent when stopping a process (e.g., 'kill' command or container shutdown)
+ * - `SIGINT` is triggered when the user interrupts the process (e.g., pressing `Ctrl + c`)
+ * - when either signal is received, `handleServerShutdown` is executed to ensure proper cleanup
+ */
+process.on('SIGTERM', handleServerShutdown);
+process.on('SIGINT', handleServerShutdown);
