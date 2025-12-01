@@ -1,4 +1,7 @@
-import { body } from 'express-validator';
+/**
+ * Node modules
+ */
+import { body, param, query } from 'express-validator';
 
 export const createBlogValidations = [
   body('title')
@@ -12,4 +15,10 @@ export const createBlogValidations = [
     .optional()
     .isIn(['draft', 'published'])
     .withMessage('Status must be one of the value, draft or published'),
+];
+
+
+
+export const slugValidation = [
+  param('slug').notEmpty().withMessage('Slug is required'),
 ];

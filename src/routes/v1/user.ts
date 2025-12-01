@@ -23,8 +23,8 @@ import updateCurrentUser from '@/controllers/v1/user/update_current_user';
 /**
  * Validators
  */
+import { paginationValidations } from '@/validators/v1';
 import {
-  getAllUserValidations,
   updateCurrentUserValidations,
   userIdValidation,
 } from '@/validators/v1/user';
@@ -35,7 +35,7 @@ router.get(
   '/',
   authenticate,
   authorize(['admin']),
-  getAllUserValidations,
+  paginationValidations,
   ValidationError,
   getAllUsers,
 );
