@@ -16,7 +16,7 @@ import type { Request, Response } from 'express';
 
 const unlikeBlog = async (req: Request, res: Response): Promise<void> => {
   const blogId = req.params.blogId;
-  const userId = req.body.userId;
+  const userId = req.userId;
   try {
 
     const existingLike = await Like.findOne({ blogId, userId }).lean().exec();

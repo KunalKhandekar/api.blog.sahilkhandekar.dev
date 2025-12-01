@@ -1,7 +1,6 @@
 /**
  * Node modules
  */
-import { body } from 'express-validator';
 import { Router } from 'express';
 
 /**
@@ -15,12 +14,14 @@ import ValidationError from '@/middlewares/validationError';
  * Validators
  */
 import { mongoIdValidator } from '@/validators/v1';
+import { createCommentValidation } from '@/validators/v1/comment';
 
 /**
  * Controllers
  */
-import likeBlog from '@/controllers/v1/like/like_blog';
-import unlikeBlog from '@/controllers/v1/like/unlike_blog';
+import createComment from '@/controllers/v1/comment/create_comment';
+import getCommentsByBlog from '@/controllers/v1/comment/get_comments_by_blog';
+import deleteComment from '@/controllers/v1/comment/delete_comment';
 
 const router = Router();
 
@@ -29,17 +30,27 @@ router.post(
   authenticate,
   authorize(['admin', 'user']),
   mongoIdValidator('blogId', 'param'),
+  createCommentValidation,
   ValidationError,
-  likeBlog,
+  createComment,
 );
 
-router.delete(
+router.get(
   '/blog/:blogId',
   authenticate,
   authorize(['admin', 'user']),
   mongoIdValidator('blogId', 'param'),
   ValidationError,
-  unlikeBlog,
+  getCommentsByBlog,
+);
+
+router.delete(
+  '/:commentId',
+  authenticate,
+  authorize(['admin', 'user']),
+  mongoIdValidator('commentId', 'param'),
+  ValidationError,
+  deleteComment,
 );
 
 export default router;

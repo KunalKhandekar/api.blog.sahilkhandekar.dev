@@ -60,7 +60,7 @@ router.get(
   '/user/:userId',
   authenticate,
   authorize(['admin', 'user']),
-  mongoIdValidator('userId'),
+  mongoIdValidator('userId', 'param'),
   paginationValidations,
   ValidationError,
   getBlogsByUser,
@@ -80,7 +80,7 @@ router.put(
   authenticate,
   authorize(['admin']),
   upload.single('banner_image'),
-  mongoIdValidator('blogId'),
+  mongoIdValidator('blogId', 'param'),
   updateBlogValidations,
   ValidationError,
   uploadBlogBanner('put'),
@@ -91,7 +91,7 @@ router.delete(
   '/:blogId',
   authenticate,
   authorize(['admin']),
-  mongoIdValidator('blogId'),
+  mongoIdValidator('blogId', 'param'),
   deleteBlog,
 );
 

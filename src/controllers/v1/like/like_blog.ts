@@ -16,7 +16,7 @@ import type { Request, Response } from 'express';
 
 const likeBlog = async (req: Request, res: Response): Promise<void> => {
   const blogId = req.params.blogId;
-  const userId = req.body.userId;
+  const userId = req.userId;
   try {
     const blog = await Blog.findById(blogId).select('likesCount').exec();
 

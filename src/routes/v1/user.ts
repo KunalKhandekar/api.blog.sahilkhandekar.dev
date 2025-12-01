@@ -64,7 +64,7 @@ router.get(
   '/:userId',
   authenticate,
   authorize(['admin']),
-  mongoIdValidator('userId'),
+  mongoIdValidator('userId', 'param'),
   ValidationError,
   getUser,
 );
@@ -73,7 +73,7 @@ router.delete(
   '/:userId',
   authenticate,
   authorize(['admin']),
-  mongoIdValidator('userId'),
+  mongoIdValidator('userId', 'param'),
   ValidationError,
   deleteUser,
 );

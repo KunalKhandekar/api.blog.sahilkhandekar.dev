@@ -1,7 +1,7 @@
 /**
  * Node modules
  */
-import { param, query } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 export const paginationValidations = [
   query('limit')
@@ -14,6 +14,17 @@ export const paginationValidations = [
     .withMessage('Offset must be a positive integer'),
 ];
 
-export const mongoIdValidator = (field: string) => {
-  return [param(field).notEmpty().isMongoId().withMessage(`Invalid ${field}`)];
+export const mongoIdValidator = (
+  field: string,
+  at: 'param' | 'body' | 'query',
+) => {
+  const source = at === 'param' ? param : at === 'body' ? body : query;
+
+  return [
+    source(field)
+      .notEmpty()
+      .withMessage(`${field} is required`)
+      .isMongoId()
+      .withMessage(`Invalid ${field}`),
+  ];
 };
