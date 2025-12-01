@@ -23,11 +23,8 @@ import updateCurrentUser from '@/controllers/v1/user/update_current_user';
 /**
  * Validators
  */
-import { paginationValidations } from '@/validators/v1';
-import {
-  updateCurrentUserValidations,
-  userIdValidation,
-} from '@/validators/v1/user';
+import { mongoIdValidator, paginationValidations } from '@/validators/v1';
+import { updateCurrentUserValidations } from '@/validators/v1/user';
 
 const router = Router();
 
@@ -67,7 +64,7 @@ router.get(
   '/:userId',
   authenticate,
   authorize(['admin']),
-  userIdValidation,
+  mongoIdValidator('userId'),
   ValidationError,
   getUser,
 );
@@ -76,7 +73,7 @@ router.delete(
   '/:userId',
   authenticate,
   authorize(['admin']),
-  userIdValidation,
+  mongoIdValidator('userId'),
   ValidationError,
   deleteUser,
 );

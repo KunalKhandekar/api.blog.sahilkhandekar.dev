@@ -75,7 +75,3 @@ export const getAllUserValidations = [
     .isInt({ min: 0 })
     .withMessage('Offset must be a positive integer'),
 ];
-
-export const userIdValidation = [
-  param('userId').notEmpty().isMongoId().withMessage('Invalid user ID'),
-];
