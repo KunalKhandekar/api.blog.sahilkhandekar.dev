@@ -3,12 +3,16 @@
  */
 import { logger } from '@/lib/winston';
 import { v2 as cloudinary } from 'cloudinary';
+import { ObjectId, Types } from 'mongoose';
 
 /**
  * Models
  */
 import User from '@/models/user';
 import Blog from '@/models/blog';
+import Comment from '@/models/comment';
+import Like from '@/models/like';
+import Token from '@/models/token';
 
 /**
  * Types
@@ -19,24 +23,64 @@ const deleteUser = async (req: Request, res: Response): Promise<void> => {
   const userId = req.params.userId;
   try {
     const blogs = await Blog.find({ author: userId })
-      .select('banner.publicId')
+      .select('_id banner.publicId')
       .lean()
       .exec();
-    const publicIds = blogs.map(({ banner }) => banner.publicId);
 
-    await cloudinary.api.delete_resources(publicIds);
-    logger.info('Multiple blog banners deleted from Cloudinary', {
-      publicIds,
-    });
+    const blogIds = blogs.map((blog) => blog._id);
+    const publicIds = blogs
+      .map((blog) => blog.banner?.publicId)
+      .filter(Boolean);
 
-    await Blog.deleteMany({ author: userId });
-    logger.info('Multiple blogs deleted', {
+    const deleteCloudinaryResources = publicIds.length
+      ? cloudinary.api.delete_resources(publicIds)
+      : null;
+
+    const deleteBlogRelated = blogIds.length
+      ? [
+          Comment.deleteMany({ blogId: { $in: blogIds } }),
+          Like.deleteMany({ blogId: { $in: blogIds } }),
+          Blog.deleteMany({ author: userId }),
+        ]
+      : [];
+
+    // Independent user related records cleanup
+    const deleteUserRelated = [
+      Comment.deleteMany({ userId }),
+      Like.deleteMany({ userId }),
+      Token.deleteMany({ userId }),
+      User.deleteOne({ _id: userId }),
+    ];
+
+    // decrease the like and comment count from other blogs
+    const likeAdjustments = await Like.aggregate([
+      { $match: { userId: new Types.ObjectId(userId) } },
+      { $group: { _id: '$blogId', count: { $sum: 1 } } },
+    ]);
+    const commentAdjustments = await Comment.aggregate([
+      { $match: { userId: new Types.ObjectId(userId) } },
+      { $group: { _id: '$blogId', count: { $sum: 1 } } },
+    ]);
+    const likeUpdates = likeAdjustments.map((l) =>
+      Blog.updateOne({ _id: l._id }, { $inc: { likesCount: -l.count } }),
+    );
+    const commentUpdates = commentAdjustments.map((c) =>
+      Blog.updateOne({ _id: c._id }, { $inc: { commentsCount: -c.count } }),
+    );
+
+    await Promise.all([
+      deleteCloudinaryResources,
+      ...deleteBlogRelated,
+      ...deleteUserRelated,
+      ...likeUpdates,
+      ...commentUpdates,
+    ]);
+
+    logger.info('User account deleted successfully', {
       userId,
-      blogs,
+      blogsDeleted: blogIds.length,
     });
 
-    await User.deleteOne({ _id: userId });
-    logger.info('A user account has been deleted', { userId });
     res.sendStatus(204);
   } catch (error) {
     res.status(500).json({

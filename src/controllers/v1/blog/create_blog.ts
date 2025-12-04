@@ -1,13 +1,8 @@
 /**
- * Node modules
-*/
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
-
-/**
  * Custom modules
 */
 import { logger } from '@/lib/winston';
+import { sanitizeContent } from '@/utils';
 
 /**
  * Models
@@ -17,22 +12,16 @@ import Blog from '@/models/blog';
 /**
  * Types
  */
-import type { Request, Response } from 'express';
 import { IBlog } from '@/models/blog';
+import type { Request, Response } from 'express';
 
 type BlogData = Pick<IBlog, 'title' | 'content' | 'banner' | 'status'>
-
-/**
- * Purify the blog content to prevent XSS attacks
-*/
-const window = new JSDOM('').window;
-const purify = DOMPurify(window);
 
 const createBlog = async (req: Request, res: Response): Promise<void> => {
     const { title, content, banner, status } = (req.body as BlogData) || {};
     const userId = req.userId;
   try {
-    const cleanContent = purify.sanitize(content);
+    const cleanContent = sanitizeContent(content);
     const newBlog = await Blog.create({
         title,
         content: cleanContent,

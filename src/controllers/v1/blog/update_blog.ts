@@ -1,13 +1,8 @@
 /**
- * Node modules
- */
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
-
-/**
  * Custom modules
  */
 import { logger } from '@/lib/winston';
+import { sanitizeContent } from '@/utils';
 
 /**
  * Models
@@ -23,11 +18,6 @@ import { IBlog } from '@/models/blog';
 
 type BlogData = Partial<Pick<IBlog, 'title' | 'content' | 'banner' | 'status'>>;
 
-/**
- * Purify the blog content to prevent XSS attacks
- */
-const window = new JSDOM('').window;
-const purify = DOMPurify(window);
 
 const updateBlog = async (req: Request, res: Response): Promise<void> => {
   const userId = req.userId;
@@ -61,7 +51,7 @@ const updateBlog = async (req: Request, res: Response): Promise<void> => {
 
     if (title) blog.title = title;
     if (content) {
-      const cleanContent = purify.sanitize(content);
+      const cleanContent = sanitizeContent(content);
       blog.content = cleanContent;
     }
     if (banner) blog.banner = banner;

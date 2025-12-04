@@ -8,6 +8,8 @@ import { v2 as cloudinary } from 'cloudinary';
  * Models
  */
 import Blog from '@/models/blog';
+import Comment from '@/models/comment';
+import Like from '@/models/like';
 import User from '@/models/user';
 
 /**
@@ -53,6 +55,11 @@ const deleteBlog = async (req: Request, res: Response): Promise<void> => {
     });
 
     await Blog.deleteOne({ _id: blogId });
+
+    // remove likes and comments associated with the blog
+    await Comment.deleteMany({ blogId });
+    await Like.deleteMany({ blogId });
+
     logger.info('Blog deleted successfully', { blogId });
     res.sendStatus(204);
   } catch (error) {

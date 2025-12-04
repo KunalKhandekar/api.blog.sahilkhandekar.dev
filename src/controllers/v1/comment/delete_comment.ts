@@ -7,7 +7,7 @@ import { logger } from '@/lib/winston';
  * Models
  */
 import Blog from '@/models/blog';
-import Comment from '@/models/commnet';
+import Comment from '@/models/comment';
 import User from '@/models/user';
 
 /**

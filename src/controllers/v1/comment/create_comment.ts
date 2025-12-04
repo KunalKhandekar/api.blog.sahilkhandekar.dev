@@ -1,34 +1,22 @@
 /**
- * Node modules
- */
-import DOMPurify from 'dompurify';
-import { JSDOM } from 'jsdom';
-
-/**
  * Custom modules
  */
 import { logger } from '@/lib/winston';
+import { sanitizeContent } from '@/utils';
 
 /**
  * Models
  */
-import User from '@/models/user';
 import Blog from '@/models/blog';
-import Comment from '@/models/commnet';
+import Comment from '@/models/comment';
 
 /**
  * Types
  */
+import { IComment } from '@/models/comment';
 import type { Request, Response } from 'express';
-import { IComment } from '@/models/commnet';
 
 type commentData = Pick<IComment, 'content'>;
-
-/**
- * Purify the comment content
- */
-const window = new JSDOM('').window;
-const purify = DOMPurify(window);
 
 const createComment = async (req: Request, res: Response): Promise<void> => {
   const { content } = req.body as commentData;
@@ -44,7 +32,7 @@ const createComment = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    const cleanContent = purify.sanitize(content);
+    const cleanContent = sanitizeContent(content);
 
     const newComment = await Comment.create({
       blogId: blog._id,
