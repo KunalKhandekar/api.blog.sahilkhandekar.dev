@@ -49,8 +49,8 @@ router.post(
 
 router.get(
   '/',
-  authenticate,
-  authorize(['admin', 'user']),
+  // authenticate,
+  // authorize(['admin', 'user']),
   paginationValidations,
   ValidationError,
   getAllBlogs,
@@ -68,8 +68,8 @@ router.get(
 
 router.get(
   '/:slug',
-  authenticate,
-  authorize(['admin', 'user']),
+  // authenticate,
+  // authorize(['admin', 'user']),
   slugValidation,
   ValidationError,
   getBlogBySlug,

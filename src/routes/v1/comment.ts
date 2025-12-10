@@ -13,7 +13,7 @@ import ValidationError from '@/middlewares/validationError';
 /**
  * Validators
  */
-import { mongoIdValidator } from '@/validators/v1';
+import { mongoIdValidator, paginationValidations } from '@/validators/v1';
 import { createCommentValidation } from '@/validators/v1/comment';
 
 /**
@@ -22,8 +22,18 @@ import { createCommentValidation } from '@/validators/v1/comment';
 import createComment from '@/controllers/v1/comment/create_comment';
 import getCommentsByBlog from '@/controllers/v1/comment/get_comments_by_blog';
 import deleteComment from '@/controllers/v1/comment/delete_comment';
+import getAllComments from '@/controllers/v1/comment/get_all_comments';
 
 const router = Router();
+
+router.get(
+  '/',
+  authenticate,
+  authorize(['admin']),
+  paginationValidations,
+  ValidationError,
+  getAllComments,
+);
 
 router.post(
   '/blog/:blogId',

@@ -64,6 +64,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: config.NODE_ENV === 'production',
       sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(201).json({
@@ -72,6 +73,8 @@ const register = async (req: Request, res: Response): Promise<void> => {
         username: newUser.username,
         email: newUser.email,
         role: newUser.role,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
       },
       accessToken,
     });

@@ -8,6 +8,7 @@ import { logger } from '@/lib/winston';
  */
 import Blog from '@/models/blog';
 import User from '@/models/user';
+import Comment from '@/models/comment';
 
 /**
  * Types
@@ -35,6 +36,13 @@ const getBlogBySlug = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    const comments = await Comment.find({ blogId: blog?._id })
+      .select('content userId createdAt')
+      .populate('userId', 'username')
+      .sort({ createdAt: -1 })
+      .lean()
+      .exec();
+
     // Show only the published blog to the nornmal user
     if (user?.role === 'user' && blog?.status == 'draft') {
       res.status(403).json({
@@ -52,6 +60,7 @@ const getBlogBySlug = async (req: Request, res: Response): Promise<void> => {
 
     res.status(200).json({
       blog,
+      comments,
     });
   } catch (error) {
     res.status(500).json({

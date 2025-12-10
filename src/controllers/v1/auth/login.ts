@@ -23,7 +23,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
   const { email } = req.body as UserData;
   try {
     const user = await User.findOne({ email })
-      .select('username email password role')
+      .select('username email password role firstName lastName')
       .lean()
       .exec();
 
@@ -54,6 +54,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: config.NODE_ENV === 'production',
       sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(201).json({
@@ -62,6 +63,8 @@ const login = async (req: Request, res: Response): Promise<void> => {
         username: user.username,
         email: user.email,
         role: user.role,
+        firstName: user.firstName,
+        lastName: user.lastName,
       },
       accessToken,
     });

@@ -13,7 +13,7 @@ dotenv.config();
 const config = {
   PORT: process.env.PORT || 3000,
   NODE_ENV: process.env.NODE_ENV,
-  WHITELIST_ORIGINS: [''],
+  WHITELIST_ORIGINS: ['http://localhost:3000', 'http://localhost:5173'],
   MONGO_URI: process.env.MONGO_URI,
   LOG_LEVEL: process.env.LOG_LEVEL,
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET as string,
