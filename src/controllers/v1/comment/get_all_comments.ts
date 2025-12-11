@@ -23,8 +23,11 @@ const getAllComments = async (req: Request, res: Response): Promise<void> => {
   try {
     const comments = await Comment.find()
       .select('-__v')
+      .populate('blogId', 'banner title slug')
+      .populate('userId', 'username')
       .limit(limit)
       .skip(offset)
+      .sort({ createdAt: -1 })
       .lean()
       .exec();
 

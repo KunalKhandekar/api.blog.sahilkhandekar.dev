@@ -12,6 +12,7 @@ import userRoutes from '@/routes/v1/user';
 import blogRoutes from '@/routes/v1/blog';
 import likeRoutes from '@/routes/v1/like';
 import commentRoutes from '@/routes/v1/comment';
+import subscriberRoutes from '@/routes/v1/subscriber';
 
 /**
  * Root route
@@ -31,5 +32,6 @@ router.use('/users', userRoutes);
 router.use('/blogs', blogRoutes);
 router.use('/likes', likeRoutes);
 router.use('/comments', commentRoutes);
+router.use('/subscribers', subscriberRoutes);
 
 export default router;

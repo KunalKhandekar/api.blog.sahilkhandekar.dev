@@ -14,6 +14,8 @@ import config from '@/config';
 import limiter from '@/lib/express_rate_limit';
 import { connectToDatabase, disconnectFromDatabase } from '@/lib/mongoose';
 import { logger, logtail } from '@/lib/winston';
+import agenda from '@/lib/agenda';
+import { defineJobs } from '@/jobs';
 
 /**
  * Router
@@ -87,6 +89,11 @@ app.use(limiter);
 (async () => {
   try {
     await connectToDatabase();
+
+    // Initialize and start Agenda
+    defineJobs();
+    await agenda.start();
+    logger.info('Agenda started!');
 
     app.use('/api/v1', v1Routes);
 

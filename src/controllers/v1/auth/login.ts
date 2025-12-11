@@ -27,12 +27,12 @@ const login = async (req: Request, res: Response): Promise<void> => {
       .lean()
       .exec();
 
-    if(!user) {
-        res.status(404).json({
-            code: "NotFound",
-            message: "User not found",
-        })
-        return;
+    if (!user) {
+      res.status(404).json({
+        code: 'NotFound',
+        message: 'User not found',
+      });
+      return;
     }
 
     // Generate access token and refresh token for new user

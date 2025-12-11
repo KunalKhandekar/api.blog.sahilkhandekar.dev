@@ -28,6 +28,7 @@ const config = {
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET as string,
   LOGTAIL_SOURCE_TOKEN: process.env.LOGTAIL_SOURCE_TOKEN as string,
   LOGTAIL_INGESTING_HOST: process.env.LOGTAIL_INGESTING_HOST as string,
+  RESEND_API_KEY: process.env.RESEND_API_KEY as string,
 };
 
 export default config;

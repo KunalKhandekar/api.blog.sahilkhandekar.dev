@@ -13,6 +13,7 @@ import Blog from '@/models/blog';
 import Comment from '@/models/comment';
 import Like from '@/models/like';
 import Token from '@/models/token';
+import Subscriber from '@/models/subscriber';
 
 /**
  * Types
@@ -22,6 +23,16 @@ import type { Request, Response } from 'express';
 const deleteUser = async (req: Request, res: Response): Promise<void> => {
   const userId = req.params.userId;
   try {
+    const user = await User.findById(userId).select('email').lean().exec();
+
+    if (!user) {
+      res.status(404).json({
+        code: 'NotFoundError',
+        message: 'User not found',
+      });
+      return;
+    }
+
     const blogs = await Blog.find({ author: userId })
       .select('_id banner.publicId')
       .lean()
@@ -75,6 +86,8 @@ const deleteUser = async (req: Request, res: Response): Promise<void> => {
       ...likeUpdates,
       ...commentUpdates,
     ]);
+
+    await Subscriber.deleteOne({ email: user.email }).exec();
 
     logger.info('User account deleted successfully', {
       userId,

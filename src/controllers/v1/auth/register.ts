@@ -3,8 +3,10 @@
  */
 import { logger } from '@/lib/winston';
 import config from '@/config';
-import { generateUsername } from '@/utils';
+import { createSubscriber, generateUsername } from '@/utils';
+import agenda from '@/lib/agenda';
 import { generateAccessToken, generateRefreshToken } from '@/lib/jwt';
+import { SEND_WELCOME_EMAIL_JOB } from '@/jobs/welcome_subscriber';
 
 /**
  * Models
@@ -65,7 +67,7 @@ const register = async (req: Request, res: Response): Promise<void> => {
       secure: config.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    });  
 
     res.status(201).json({
       message: 'New user created',
@@ -79,6 +81,9 @@ const register = async (req: Request, res: Response): Promise<void> => {
       accessToken,
     });
 
+    await createSubscriber(email);
+    await agenda.now(SEND_WELCOME_EMAIL_JOB, { email: newUser.email });
+    
     logger.info('User register successfully.', {
       username: newUser.username,
       email: newUser.email,
